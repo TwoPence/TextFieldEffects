@@ -46,6 +46,11 @@ import UIKit
         }
     }
     
+    /** 
+     Color of the placeholder when the text field is being edited.
+    */
+    @IBInspectable dynamic open var placeholderEditingColor: UIColor = .lightGray
+    
     /**
      The scale of the placeholder font.
      
@@ -105,6 +110,7 @@ import UIKit
         
         layoutPlaceholderInTextRect()
         placeholderLabel.font = placeholderFontFromFont(font!)
+        placeholderLabel.textColor = placeholderEditingColor
         placeholderLabel.frame.origin = activePlaceholderPoint
         
         UIView.animate(withDuration: 0.4, animations: {
@@ -124,6 +130,7 @@ import UIKit
             })
             
             placeholderLabel.font = font!
+            placeholderLabel.textColor = placeholderColor
             activeBorderLayer.frame = self.rectForBorder(self.borderThickness.active, isFilled: false)
         }
     }
