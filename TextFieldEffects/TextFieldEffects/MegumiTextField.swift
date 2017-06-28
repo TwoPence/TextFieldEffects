@@ -131,6 +131,7 @@ import UIKit
             
             placeholderLabel.font = font!
             placeholderLabel.textColor = placeholderColor
+            placeholderLabel.sizeToFit()
             activeBorderLayer.frame = self.rectForBorder(self.borderThickness.active, isFilled: false)
         }
     }
