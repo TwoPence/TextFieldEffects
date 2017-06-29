@@ -75,7 +75,7 @@ import UIKit
         }
     }
     
-    private let borderThickness: (active: CGFloat, inactive: CGFloat) = (active: 1.5, inactive: 1.0)
+    private let borderThickness: (active: CGFloat, inactive: CGFloat) = (active: 1.0, inactive: 1.0)
     private let placeholderInsets = CGPoint(x: 0, y: 6)
     private let textFieldInsets = CGPoint(x: 0, y: 12)
     private let inactiveBorderLayer = CALayer()
@@ -132,8 +132,8 @@ import UIKit
             placeholderLabel.font = font!
             placeholderLabel.textColor = placeholderColor
             placeholderLabel.sizeToFit()
-            activeBorderLayer.frame = self.rectForBorder(self.borderThickness.active, isFilled: false)
         }
+        activeBorderLayer.frame = self.rectForBorder(self.borderThickness.active, isFilled: false)
     }
     
     // MARK: - Private
