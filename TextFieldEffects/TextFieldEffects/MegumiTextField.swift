@@ -8,6 +8,11 @@
 
 import UIKit
 
+enum State: Int {
+    case Entry
+    case Display
+}
+
 /**
  An HoshiTextField is a subclass of the TextFieldEffects object, is a control that displays an UITextField with a customizable visual effect around the lower edge of the control.
  */
@@ -81,6 +86,7 @@ import UIKit
     private let inactiveBorderLayer = CALayer()
     private let activeBorderLayer = CALayer()
     private var activePlaceholderPoint: CGPoint = CGPoint.zero
+    private var displayWidth: CGFloat = 0
     
     // MARK: - TextFieldEffects
     
@@ -108,10 +114,9 @@ import UIKit
             })
         }
         
-        layoutPlaceholderInTextRect()
-        placeholderLabel.font = placeholderFontFromFont(font!)
-        placeholderLabel.textColor = placeholderEditingColor
+        layoutPlaceholderInTextRect(forState: .Entry)
         placeholderLabel.frame.origin = activePlaceholderPoint
+        placeholderLabel.textColor = placeholderEditingColor
         
         UIView.animate(withDuration: 0.4, animations: {
             self.placeholderLabel.alpha = 1.0
@@ -123,15 +128,13 @@ import UIKit
     override open func animateViewsForTextDisplay() {
         if text!.isEmpty {
             UIView.animate(withDuration: 0.35, delay: 0.0, usingSpringWithDamping: 0.8, initialSpringVelocity: 2.0, options: UIViewAnimationOptions.beginFromCurrentState, animations: ({
-                self.layoutPlaceholderInTextRect()
+                self.layoutPlaceholderInTextRect(forState: .Display)
                 self.placeholderLabel.alpha = 1
             }), completion: { _ in
                 self.animationCompletionHandler?(.textDisplay)
             })
             
-            placeholderLabel.font = font!
             placeholderLabel.textColor = placeholderColor
-            placeholderLabel.sizeToFit()
         }
         activeBorderLayer.frame = self.rectForBorder(self.borderThickness.active, isFilled: false)
     }
@@ -150,7 +153,7 @@ import UIKit
         placeholderLabel.text = placeholder
         placeholderLabel.textColor = placeholderColor
         placeholderLabel.sizeToFit()
-        layoutPlaceholderInTextRect()
+        layoutPlaceholderInTextRect(forState: .Display)
         
         if isFirstResponder || text!.isNotEmpty {
             animateViewsForTextEntry()
@@ -170,9 +173,21 @@ import UIKit
         }
     }
     
-    private func layoutPlaceholderInTextRect() {
+    private func layoutPlaceholderInTextRect(forState: State) {
         let textRect = self.textRect(forBounds: bounds)
         var originX = textRect.origin.x
+
+        switch forState {
+        case .Display:
+            placeholderLabel.font = font!
+            placeholderLabel.sizeToFit()
+            // MARK: - Capture full-size width and apply it to the frame below. Otherwise the label will be truncated from the right when it animates into the display position.
+            displayWidth = placeholderLabel.bounds.width
+        case .Entry:
+            placeholderLabel.font = placeholderFontFromFont(font!)
+            placeholderLabel.sizeToFit()
+        }
+
         switch self.textAlignment {
         case .center:
             originX += textRect.size.width/2 - placeholderLabel.bounds.width/2
@@ -182,7 +197,7 @@ import UIKit
             break
         }
         placeholderLabel.frame = CGRect(x: originX, y: textRect.height/2,
-                                        width: placeholderLabel.bounds.width, height: placeholderLabel.bounds.height)
+                                        width: displayWidth, height: placeholderLabel.bounds.height)
         activePlaceholderPoint = CGPoint(x: placeholderLabel.frame.origin.x, y: placeholderLabel.frame.origin.y - placeholderLabel.frame.size.height - placeholderInsets.y)
     }
     
